@@ -45,7 +45,7 @@ RPi.GPIO==0.7.1
 seqlog==0.3.26
 six==1.16.0
 spidev==3.6
-ssh-import-id==5.10
+ssh-import-id==5.11
 texttable==1.6.7
 toml==0.10.2
 unattended-upgrades==0.1
