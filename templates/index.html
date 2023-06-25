@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Satellite Location</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" integrity="sha512-t4GWSVZO1eC8BM339Xd7Uphw5s17a86tIZIj8qRxhnKub6WoyhnrxeCIMeAqBPgdZGlCcG2PrZjMc+Wr78+5Xg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+      body {
+        background-color: #121212;
+        color: #ffffff;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="jumbotron bg-dark">
+      <h1 class="display-4" id="DeviceName">Satellite Location</h1>
+      <h2 id="LiveTime"></h2>
+    </div>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-3"><div id="cardContainer"></div></div>
+        <div class="col-md-9">
+          <table class="table table-dark table-bordered" id="SatTable">
+            <thead>
+              <th scope="col">PRN ID</th>
+              <th scope="col">PRN Type</th>
+              <th scope="col">Azimuth, degrees from true north.</th>
+              <th scope="col">Elevation in degrees.</th>
+              <th scope="col">Signal to Noise ratio in dBHz</th>
+              <th scope="col">Used in current solution</th>
+              <th scope="col">gnss</th>
+              <th scope="col">gnssid</th>
+              <th scope="col">satellite ID</th>
+              <th scope="col">health</th>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script src=" https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.min.js" integrity="sha512-3dZ9wIrMMij8rOH7X3kLfXAzwtcHpuYpEgQg1OA4QAob1e81H8ntUQmQm3pBudqIoySO5j0tHN4ENzA6+n2r4w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+      var jsonDataPromise = fetchData("http://127.0.0.1:9999/gps") //CHANGE TO MACHINE'S IP
+
+      jsonDataPromise.then(jsonData =>{
+        console.log(jsonData)
+        const skyobject = jsonData.filter((obj) => obj.class == "SKY")[0]
+        console.log(skyobject)
+        const satellites = skyobject.satellites
+        console.log(jsonData.filter((obj) => obj.class == "DEVICES")[0])
+        populateCard(jsonData.filter((obj) => obj.class == "DEVICES")[0])
+
+        // Convert to CST
+        const date = new Date(skyobject.time)
+        console.log(date)
+        const cstString = date.toLocaleString("en-US", {timeZone: "America/Chicago"})
+
+        document.querySelector("#LiveTime").innerHTML = cstString + " within 2 seconds"
+        document.querySelector("#DeviceName").innerHTML = skyobject.device
+        satellites.forEach(function (satellite) {AddToTable(satellite)})
+      })
+
+      async function fetchData(url) {
+        try {
+          const response = await fetch(url)
+          if (!response.ok) {throw new Error(`HTTP error! Status: ${response.status}`)}
+          const data = await response.json()
+          return data
+        } catch (error) {
+          console.error("Error:", error)
+          throw error
+        }
+      }
+
+      function AddToTable(satellite) {
+        const row = document.createElement("tr");
+        row.setAttribute("scope", "row");
+
+        const items = [
+          satellite.PRN,
+          convertPRnToType(satellite.PRN),
+          satellite.az + "°",
+          satellite.el + "°",
+          satellite.ss,
+          satellite.used,
+          convertGnssId(satellite.gnssid),
+          satellite.gnssid,
+          satellite.svid,
+          healthCheck(satellite.health)
+        ]
+
+        items.forEach((element) => {
+          const cell = document.createElement("td")
+          cell.textContent = element || ""
+          row.append(cell)
+        })
+
+        const tableBody = document.querySelector("#SatTable tbody")
+        if (!tableBody) {
+          const tbody = document.createElement("tbody")
+          document.querySelector("#SatTable").appendChild(tbody)
+        }
+        tableBody.appendChild(row)
+      }
+
+      function convertPRnToType(prn) {
+        if (prn < 63) {
+          return "GNSS";
+        } else if (prn < 96) {
+          return "GLONASS (Russian)";
+        } else {
+          return "SBAS";
+        }
+      }
+
+      function healthCheck(health) {
+        //The health of this satellite.0 is unknown, 1 is OK, and 2 is unhealthy.
+        if (health == 1) return "Healthy";
+        if (health == 2) return "Unhealthy";
+        return "unknown";
+      }
+
+      function convertGnssId(gnssid) {
+        const gnssNames = {
+          0: "GPS (US)",
+          2: "Galileo (EU)",
+          3: "Beidou (China)",
+          5: "QZSS (Japan)",
+          6: "GLONASS (Russia)"
+        };
+
+        return gnssNames[gnssid] || "UNKNOWN";
+      }
+
+      function populateCard(data) {
+        const cardContainer = document.getElementById("cardContainer")
+        const card = document.createElement("div")
+        card.className = "card bg-info mb-3"
+        const cardBody = document.createElement("div")
+        cardBody.className = "card-body"
+        Object.entries(data.devices[0]).forEach(
+          ([attribute, attributeValue]) => {
+            const paragraph = document.createElement("p")
+            paragraph.textContent = `${attribute}: ${attributeValue}`
+            cardBody.appendChild(paragraph)
+          }
+        );
+        card.appendChild(cardBody)
+        cardContainer.appendChild(card)
+      }
+    </script>
+  </body>
+</html>

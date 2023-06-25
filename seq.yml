@@ -1,0 +1,28 @@
+# This is the Python logging schema version (currently, only the value 1 is supported here).
+version: 1
+# Configure logging from scratch.
+disable_existing_loggers: True
+# Configure the root logger to use Seq
+root:
+  level: INFO
+  handlers:
+#  - seq
+  - console
+
+handlers:
+# Log to STDOUT
+  console:
+    class: seqlog.structured_logging.ConsoleStructuredLogHandler
+    formatter: seq
+
+# Log to Seq
+#  seq:
+#    class: seqlog.structured_logging.SeqLogHandler
+#    formatter: seq
+#    server_url: 'http://127.0.0.1:5341'
+#    api_key: 'NOPE'
+#    json_encoder_class: json.encoder.JSONEncoder
+
+formatters:
+  seq:
+    style: '{'
