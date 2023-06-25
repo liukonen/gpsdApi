@@ -32,7 +32,7 @@ more-itertools==4.2.0
 numpy==1.25.0
 olefile==0.46
 Pillow==9.5.0
-pycairo==1.16.2
+pycairo==1.24.0
 PyGObject==3.44.1
 pyparsing==2.4.7
 pyrsistent==0.15.5
