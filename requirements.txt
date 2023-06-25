@@ -40,7 +40,7 @@ pyserial==3.5b0
 python-apt==2.2.1
 python-dateutil==2.8.1
 PyYAML==5.3.1
-requests==2.25.1
+requests==2.31.0
 RPi.GPIO==0.7.1
 seqlog==0.3.26
 six==1.16.0
