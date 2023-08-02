@@ -2,7 +2,7 @@ attrs==23.1.0
 blinker==1.6.2
 cached-property==1.5.2
 certifi==2023.7.22
-chardet==5.1.0
+chardet==5.2.0
 click==8.1.6
 colorzero==2.0
 cycler==0.11.0
