@@ -42,7 +42,7 @@ python-dateutil==2.8.2
 PyYAML==6.0.1
 requests==2.31.0
 RPi.GPIO==0.7.1
-seqlog==0.3.26
+seqlog==0.3.27
 six==1.16.0
 spidev==3.6
 ssh-import-id==5.11
