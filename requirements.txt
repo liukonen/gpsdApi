@@ -1,2 +1,2 @@
 Flask==2.3.3
-seqlog==0.3.28
+seqlog==0.3.29
