@@ -1,2 +1,2 @@
-Flask==3.0.2
+Flask==3.0.3
 seqlog==0.3.30
